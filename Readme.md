@@ -1,7 +1,4 @@
-appname = rentFrontend
-httpport = 8080
-runmode = dev
-# Cat APP Go Project
+# Rent By Owner Go Frontend Project
 
 This project aims to design two front-end pages: property listing and property details.
 
