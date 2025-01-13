@@ -70,7 +70,7 @@
         <!-- Breadcrumb -->
         <div id="locationBreadcrumb" class="text-sm text-gray-600 mb-4"></div>
         
-        <h1 id="pageTitle" class="text-3xl font-bold text-blue-900 mb-6">Rent By Owner England - Vacation Rentals in England</h1>
+        <h1 id="pageTitle" class="text-3xl font-bold text-blue-900 mb-6">Rent By Owner</h1>
         
 
         <!-- Property Grid -->
