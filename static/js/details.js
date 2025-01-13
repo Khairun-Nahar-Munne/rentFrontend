@@ -62,7 +62,6 @@ function loadPropertyDetails(propertyId) {
 }
   
 function displayPropertyDetails(property) {
-    // Update breadcrumbs with clickable links
     document.getElementById("breadcrumbs").innerHTML = property.breadcrumbs
       .map(
         (crumb, index) => `
@@ -175,8 +174,6 @@ function handleBreadcrumbClick(event) {
     
     // Get the base URL dynamically
     const baseUrl = window.location.origin;
-    
-  
     
     // Construct the final URL
     const newUrl = `${baseUrl}`;

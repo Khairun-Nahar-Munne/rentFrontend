@@ -11,6 +11,3 @@ type MainController struct {
 func (c *MainController) Get() {
 	c.TplName = "index.tpl"
 }
-func (c *PropertyController) DetailsPage() {
-    c.TplName = "property-details.tpl"
-}
