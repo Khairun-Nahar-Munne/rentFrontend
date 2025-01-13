@@ -47,7 +47,7 @@ $(document).ready(function () {
   
 function loadPropertyDetails(propertyId) {
     $.ajax({
-      url: `http://localhost:8000/v1/property/details?property_id=${propertyId}`,
+      url: `/api/details/fetch?property_id=${propertyId}`,
       method: "GET",
       crossDomain: true, 
       success: function (response) {

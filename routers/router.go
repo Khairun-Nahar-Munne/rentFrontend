@@ -8,4 +8,6 @@ import (
 func init() {
     beego.Router("/", &controllers.MainController{})
 	beego.Router("/property-details", &controllers.PropertyController{})
+	beego.Router("/api/list/fetch", &controllers.PropertyClientController{})
+	beego.Router("/api/details/fetch", &controllers.PropertyDetailsClientController{})
 }

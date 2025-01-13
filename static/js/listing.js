@@ -65,9 +65,8 @@ $(document).ready(function() {
 
 function showLocationDropdown(query) {
     $.ajax({
-        url: 'http://localhost:8000/v1/property/list',
+        url: '/api/list/fetch',
         method: 'GET',
-        crossDomain: true,
         success: function(response) {
             if (response.success) {
                 const matchedLocations = response.locations.filter(loc => 
@@ -107,9 +106,8 @@ function hideLocationDropdown() {
 
 function loadPropertiesByLocation(locationId) {
     $.ajax({
-        url: 'http://localhost:8000/v1/property/list',
+        url: '/api/list/fetch',
         method: 'GET',
-        crossDomain: true, 
         success: function(response) {
             if (response.success) {
                 const location = response.locations.find(loc => loc.id === locationId);
@@ -340,9 +338,8 @@ function displayProperties(properties) {
 
 function handleBreadcrumbClick(locationName, level) {
     $.ajax({
-        url: 'http://localhost:8000/v1/property/list',
+        url: '/api/list/fetch',
         method: 'GET',
-        crossDomain: true, 
         success: function(response) {
             if (response.success) {
                 const location = response.locations.find(loc => 
