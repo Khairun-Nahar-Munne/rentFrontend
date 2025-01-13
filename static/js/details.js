@@ -101,8 +101,28 @@ function displayPropertyDetails(property) {
     const detailsHTML = `
           <div class="grid grid-cols-1 gap-8">
               <div>
+              <h1 class="text-2xl font-bold text-blue-900 mb-4">
+                      ${bedsInfo} ${property.hotel_name} ${property.city_in_trans}
+                  </h1>
+                  <div class="md:items-center mb-4">
+                      <span class="inline-flex items-center justify-center border-2 text-white bg-blue-900 rounded-full w-7 h-7 ml-1">
+                        <i class="fa-solid fa-thumbs-up text-sm"></i>
+                      </span>   
+                      <span class="text-blue-900 font-bold text-xl">${property.rating}</span>
+                      <span class=" text-gray-600 text-sm">(${property.review_count} Reviews)</span>
+                      <span class="mx-1">|</span>
+                      <span class=" text-gray-600 text-sm">${roomsInfo}</span>
+                      <span class="md:ml-2 text-gray-600">
+                          ${property.amenities.map(amenity => `
+                            <span class="mr-2 text-sm">
+                                ${getAmenityIcon(amenity)}
+                                ${amenity}
+                            </span>
+                        `).join(' ')}
+                      </span>
+                  </div>
                   <div class="md:grid md:grid-cols-2 md:gap-2">
-                      <img src="${property.images[0] || "/static/images/placeholder.jpg"}" 
+                      <img src="${property.images[0]}" 
                            alt="${property.hotel_name}" 
                            class="md:w-full w-full h-96 object-cover rounded-lg">
                       <div class="grid grid-cols-2 gap-2 mt-2 md:mt-0">
@@ -121,26 +141,8 @@ function displayPropertyDetails(property) {
                   </div>
               </div>
               <div>
-                  <h1 class="text-3xl font-bold text-blue-900 mb-4">
-                      ${bedsInfo} ${property.hotel_name} ${property.city_in_trans}
-                  </h1>
-                  <div class="md:items-center mb-4">
-                      <span class="inline-flex items-center justify-center border-2 text-white bg-blue-900 rounded-full w-6 h-6 ml-1">
-                        <i class="fa-solid fa-thumbs-up text-xs"></i>
-                      </span>   
-                      <span class="text-blue-900 font-bold text-sm">${property.rating}</span>
-                      <span class=" text-gray-600 text-xs">(${property.review_count} Reviews)</span>
-                      <span class="mx-1">|</span>
-                      <span class=" text-gray-600 text-xs">${roomsInfo}</span>
-                      <span class="md:ml-2 text-gray-600">
-                          ${property.amenities.map(amenity => `
-                            <span class="mr-2 text-xs">
-                                ${getAmenityIcon(amenity)}
-                                ${amenity}
-                            </span>
-                        `).join(' ')}
-                      </span>
-                  </div>
+                  
+
                   <div class="mb-6">
                       <h2 class="text-xl font-bold mb-2">Description</h2>
                       <p class="text-gray-600">
@@ -168,21 +170,13 @@ function displayPropertyDetails(property) {
     document.getElementById("propertyDetails").innerHTML = detailsHTML;
 }
 
-function handleBreadcrumbClick(event, locationName, level) {
+function handleBreadcrumbClick(event) {
     event.preventDefault(); // Prevent default anchor behavior
     
     // Get the base URL dynamically
     const baseUrl = window.location.origin;
     
-    // Create the search parameters
-    const params = new URLSearchParams();
-    params.set('location', locationName);
-    
-    // Preserve other query parameters if needed
-    const currentParams = new URLSearchParams(window.location.search);
-    if (currentParams.has('view')) {
-        params.set('view', currentParams.get('view'));
-    }
+  
     
     // Construct the final URL
     const newUrl = `${baseUrl}`;

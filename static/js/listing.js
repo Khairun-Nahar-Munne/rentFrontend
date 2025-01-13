@@ -135,7 +135,7 @@ function updateBreadcrumb(location) {
         const lastLocation = breadcrumbs[breadcrumbs.length - 1];
 
         const breadcrumbHTML = `
-            <div class="flex items-center text-sm">
+            <span class="items-center text-sm">
                 <span class="text-blue-900 font-bold">Vacation Rentals in ${lastLocation}</span>
                 <span class="mx-2">|</span>
                 ${breadcrumbs.map((crumb, index) => `
@@ -144,10 +144,10 @@ function updateBreadcrumb(location) {
                         ${crumb}
                     </span>
                     ${index < breadcrumbs.length - 1 ? 
-                        '<span class="mx-2 text-gray-400">></span>' : 
+                        '<span class="mx-2 text-gray-400"></span>' : 
                         ''}
                 `).join('')}
-            </div>
+            </span>
         `;
         document.getElementById('locationBreadcrumb').innerHTML = breadcrumbHTML;
         
