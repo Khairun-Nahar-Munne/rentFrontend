@@ -3,7 +3,7 @@ httpport = 8080
 runmode = dev
 # Cat APP Go Project
 
-This project aims to fetch data from Booking.com and store it in a local PostgreSQL database. We will create a backend API using the Beego framework to serve the property data and design two front-end pages: property listing and property details.
+This project aims to design two front-end pages: property listing and property details.
 
 ## Table of Contents
 
@@ -176,7 +176,7 @@ rent/
 ```
 
 - `conf/`: Contains configuration files
-- `controllers/`: Contains the logic for handling API requests (fetcing and store data from booking.com api and fetch the data from local database)
+- `controllers/`: Contains the logic for handling API requests 
 - `routers/`: Defines the routing for the application
 - `models/`: Define structure of the data of database
 - `main.go`: The entry point of the application
