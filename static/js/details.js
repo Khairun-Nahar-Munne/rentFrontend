@@ -49,7 +49,6 @@ function loadPropertyDetails(propertyId) {
     $.ajax({
       url: `/api/details/fetch?property_id=${propertyId}`,
       method: "GET",
-      crossDomain: true, 
       success: function (response) {
         if (response.success) {
           displayPropertyDetails(response.property);
