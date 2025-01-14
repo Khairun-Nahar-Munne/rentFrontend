@@ -1,4 +1,4 @@
-let currentLocationId = 1; // Default location ID
+
 let selectedLocation = null;
 let slideIndexes = {}; 
 let xDown = null;
@@ -6,13 +6,14 @@ let yDown = null;
 
 
 $(document).ready(function() {
-    loadPropertiesByLocation(currentLocationId);
+    
+    loadAllProperties();
     
     // Search toggle functionality
     $('#searchToggle').on('click', function() {
         setTimeout(() => {
             $('.search-dropdown').removeClass('transform -translate-y-full');
-        }, 100);
+        }, 0);
         $('.search-dropdown').removeClass('hidden');
         $('.search-dropdown').addClass('active');
         $('.navigation').removeClass('active');
@@ -28,7 +29,7 @@ $(document).ready(function() {
             $('.search-dropdown').addClass('hidden');
             $('.navigation').removeClass('hidden');
             $('.navigation').addClass('active');
-        }, 100); // Match this duration with Tailwind's duration-300
+        }, 300); // Match this duration with Tailwind's duration-300
     
         hideLocationDropdown();
     });
@@ -47,8 +48,10 @@ $(document).ready(function() {
     $('.container button').on('click', function() {
         if (selectedLocation) {
             loadPropertiesByLocation(selectedLocation.id);
-            $('.search-dropdown').removeClass('active');
+        } else {
+            loadAllProperties();
         }
+        $('.search-dropdown').removeClass('active');
     });
 
 
@@ -336,6 +339,8 @@ function displayProperties(properties) {
 }
 
 function handleBreadcrumbClick(locationName, level) {
+
+    
     $.ajax({
         url: '/api/list/fetch',
         method: 'GET',
@@ -345,10 +350,42 @@ function handleBreadcrumbClick(locationName, level) {
                     loc.value.toLowerCase() === locationName.toLowerCase()
                 );
                 if (location) {
-                    currentLocationId = location.id;
                     loadPropertiesByLocation(location.id);
                 }
             }
+        }
+    });
+}
+function loadAllProperties() {
+    $.ajax({
+        url: '/api/list/fetch',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                // Collect all properties from all locations into a single array
+                const allProperties = response.locations.reduce((acc, location) => {
+                    if (location.properties && Array.isArray(location.properties)) {
+                        return [...acc, ...location.properties];
+                    }
+                    return acc;
+                }, []);
+                
+                // Update page title for all properties view
+                document.getElementById('pageTitle').textContent = 'All Vacation Rentals';
+                
+                // Update breadcrumb for all properties view
+                document.getElementById('locationBreadcrumb').innerHTML = `
+                    <span class="items-center text-sm">
+                        <span class="text-blue-900 font-bold">All Vacation Rentals</span>
+                    </span>
+                `;
+                
+                // Display all properties
+                displayProperties(allProperties);
+            }
+        },
+        error: function(error) {
+            console.error('Error loading properties:', error);
         }
     });
 }

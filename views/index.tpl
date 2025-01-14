@@ -59,7 +59,7 @@
                         <input type="text" id="locationSearch" placeholder="United States of America" 
                             class="w-full p-2 rounded-lg">
                     </div>
-                    <button class="bg-emerald-500 text-white px-6 py-2 rounded-lg">Search</button>
+                    <button id="buttonSearch" class="bg-emerald-500 text-white px-6 py-2 rounded-lg">Search</button>
                     <button id="closeSearch" class="text-white hover:text-gray-200">Close</button>
                 </div>
             </div>
