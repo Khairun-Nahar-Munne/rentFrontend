@@ -1,27 +1,27 @@
-// controllers/property_client_controller.go
 package controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"rentFrontend/models"
-	"strings"
-	"sync"
+    "encoding/json"
+    "io/ioutil"
+    "net/http"
+    "strings"
+    "sync"
+    "rentFrontend/models"
 
-	beego "github.com/beego/beego/v2/server/web"
+    beego "github.com/beego/beego/v2/server/web"
 )
 
 type PropertySpecificController struct {
     beego.Controller
 }
 
-
-
 func (c *PropertySpecificController) Get() {
-    // Get the full path and split it into breadcrumb components
-    path := c.Ctx.Input.Param(":splat")
-    breadcrumbs := strings.Split(path, "/")
+    // Extract the location path from the URL
+    fullPath := c.Ctx.Request.URL.Path
+    // Remove the base path "/api/list/fetch/" to get just the location parts
+    locationPath := strings.TrimPrefix(fullPath, "/api/list/fetch/")
+    // Split the path into location components
+    locationParts := strings.Split(strings.Trim(locationPath, "/"), "/")
 
     apiURL := "http://localhost:8000/v1/property/list"
     
@@ -32,10 +32,11 @@ func (c *PropertySpecificController) Get() {
     var wg sync.WaitGroup
     wg.Add(1)
     
-    // Fetch data asynchronously
+    // Fetch and filter data asynchronously
     go func() {
         defer wg.Done()
         
+        // Fetch data from API
         resp, err := http.Get(apiURL)
         if err != nil {
             errorChan <- err
@@ -55,34 +56,12 @@ func (c *PropertySpecificController) Get() {
             errorChan <- err
             return
         }
-        
-        // Filter locations based on breadcrumbs
-        filteredLocations := make([]models.Location, 0)
-        for _, location := range propertyResp.Locations {
-            filteredProperties := make([]models.Property, 0)
-            
-            for _, property := range location.Properties {
-                // Check if property breadcrumbs match the requested path
-                matches := true
-                for i, crumb := range breadcrumbs {
-                    if i >= len(property.Breadcrumbs) || !strings.EqualFold(property.Breadcrumbs[i], crumb) {
-                        matches = false
-                        break
-                    }
-                }
-                
-                if matches {
-                    filteredProperties = append(filteredProperties, property)
-                }
-            }
-            
-            if len(filteredProperties) > 0 {
-                location.Properties = filteredProperties
-                filteredLocations = append(filteredLocations, location)
-            }
-        }
-        
+
+        // Filter locations based on the location path
+        filteredLocations := filterLocationsByPath(propertyResp.Locations, locationParts)
         propertyResp.Locations = filteredLocations
+        propertyResp.Success = len(filteredLocations) > 0
+        
         responseChan <- propertyResp
     }()
     
@@ -101,15 +80,76 @@ func (c *PropertySpecificController) Get() {
             "error":   err.Error(),
         }
     case response := <-responseChan:
-        if len(response.Locations) == 0 {
-            c.Data["json"] = map[string]interface{}{
-                "success": false,
-                "error":   "No properties found for the specified location",
-            }
-        } else {
-            c.Data["json"] = response
+        c.Data["json"] = map[string]interface{}{
+            "success": response.Success,
+            "data":    response,
         }
     }
     
     c.ServeJSON()
+}
+
+// filterLocationsByPath filters locations and properties based on the provided location path
+func filterLocationsByPath(locations []models.Location, locationPath []string) []models.Location {
+    if len(locationPath) == 0 {
+        return locations
+    }
+
+    filteredLocations := make([]models.Location, 0)
+    for _, location := range locations {
+        filteredProperties := make([]models.Property, 0)
+        
+        for _, property := range location.Properties {
+            if matchesLocationPath(property, locationPath) {
+                filteredProperties = append(filteredProperties, property)
+            }
+        }
+        
+        if len(filteredProperties) > 0 {
+            locationCopy := location
+            locationCopy.Properties = filteredProperties
+            filteredLocations = append(filteredLocations, locationCopy)
+        }
+    }
+    
+    return filteredLocations
+}
+
+// matchesLocationPath checks if a property matches the given location path
+func matchesLocationPath(property models.Property, locationPath []string) bool {
+    if len(locationPath) == 0 || len(property.Breadcrumbs) == 0 {
+        return false
+    }
+
+    // For single-level path (e.g., "united-states-of-america"), 
+    // match if it's anywhere in the breadcrumbs
+    if len(locationPath) == 1 {
+        searchTerm := normalizePathComponent(locationPath[0])
+        for _, crumb := range property.Breadcrumbs {
+            if normalizePathComponent(crumb) == searchTerm {
+                return true
+            }
+        }
+        return false
+    }
+
+    // For multi-level paths, ensure they match in sequence
+    for i, pathComponent := range locationPath {
+        if i >= len(property.Breadcrumbs) {
+            return false
+        }
+        if normalizePathComponent(pathComponent) != normalizePathComponent(property.Breadcrumbs[i]) {
+            return false
+        }
+    }
+    
+    return true
+}
+
+// normalizePathComponent normalizes a path component for comparison
+func normalizePathComponent(component string) string {
+    // Convert to lowercase and replace spaces with hyphens
+    normalized := strings.ToLower(component)
+    normalized = strings.ReplaceAll(normalized, " ", "-")
+    return normalized
 }

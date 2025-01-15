@@ -11,4 +11,5 @@ func init() {
 	beego.Router("/api/list/fetch", &controllers.PropertyClientController{})
 	beego.Router("/api/details/fetch", &controllers.PropertyDetailsClientController{})
 	beego.Router("/api/list/fetch/*", &controllers.PropertySpecificController{})
+	beego.Router("/*", &controllers.PropertyViewController{})
 }

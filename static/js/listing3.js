@@ -63,19 +63,6 @@ $(document).ready(function() {
     $(document).on('touchmove', '.property-slider', handleTouchMove);
 });
 
-function updateURL(location) {
-    if (location && location.properties && location.properties[0]) {
-        const breadcrumbs = location.properties[0].breadcrumbs;
-        // Create URL-friendly breadcrumb path
-        const urlPath = breadcrumbs
-            .map(crumb => encodeURIComponent(crumb.toLowerCase().replace(/\s+/g, ' ')))
-            .join('/');
-        
-        // Update URL without refreshing the page
-        const newURL = `/${urlPath}`;
-        window.history.pushState({ locationId: location.id }, '', newURL);
-    }
-}
 function showLocationDropdown(query) {
     $.ajax({
         url: '/api/list/fetch',
@@ -131,8 +118,6 @@ function loadPropertiesByLocation(locationId) {
                     // Update search input with current location
                     $('#locationSearch').val(location.value);
                     selectedLocation = location;
-                    // Update URL with new location
-                    updateURL(location);
                 }
             }
         },
@@ -141,13 +126,6 @@ function loadPropertiesByLocation(locationId) {
         }
     });
 }
-
-// Add event listener for browser back/forward buttons
-window.addEventListener('popstate', function(event) {
-    if (event.state && event.state.locationId) {
-        loadPropertiesByLocation(event.state.locationId);
-    }
-});
 
 function updateBreadcrumb(location) {
     if (location.properties && location.properties.length > 0 && location.properties[0].breadcrumbs) {
@@ -159,20 +137,33 @@ function updateBreadcrumb(location) {
                 <span class="text-blue-900 font-bold">Vacation Rentals in ${lastLocation}</span>
                 <span class="mx-2">|</span>
                 ${breadcrumbs.map((crumb, index) => `
-                    <a href="/${breadcrumbs.slice(0, index + 1).join('/')}"
-                       target="_blank"
-                       class="text-gray-600 hover:text-blue-600">
+                    <span class="text-gray-600 cursor-pointer hover:text-blue-600" 
+                          onclick="handleBreadcrumbClick('${crumb}', ${index})">
                         ${crumb}
-                    </a>
+                    </span>
                     ${index < breadcrumbs.length - 1 ? 
-                        '<span class="mx-2 text-gray-400">></span>' : ''}
-                `).join('')}
+                        '<span class="mx-2 text-gray-400"></span>' : ''}
+                `).join('>')}
             </span>
         `;
         document.getElementById('locationBreadcrumb').innerHTML = breadcrumbHTML;
+        
+    } else {
+        // Fallback if no breadcrumbs available
+        const breadcrumbHTML = `
+            <div class="flex items-center text-sm">
+                <span class="text-blue-900 font-bold">Vacation Rentals in ${location.value}</span>
+                <span class="mx-2">|</span>
+                <span class="text-gray-600 cursor-pointer hover:text-blue-600" 
+                      onclick="loadPropertiesByLocation(${location.id})">
+                    ${location.value}
+                </span>
+            </div>
+        `;
+        document.getElementById('locationBreadcrumb').innerHTML = breadcrumbHTML;
+        
     }
 }
-
 
 function updatePageTitle(location) {
     const pageTitle = document.getElementById('pageTitle');
@@ -320,14 +311,13 @@ function displayProperties(properties) {
                         ${property.amenities.join('<i class="fas fa-circle text-[8px] mx-2 align-middle"></i>')}
                     </div>
                     <div class="text-blue-900 mb-2 text-xs">
-                    ${property.breadcrumbs.map((crumb, index) => `
-                        <a href="/${property.breadcrumbs.slice(0, index + 1).join('/')}"
-                           target="_blank"
-                           class="text-[#27357e] hover:text-blue-700 text-sm">
-                            ${crumb}
-                        </a>
-                        ${index < property.breadcrumbs.length - 1 ? ' > ' : ''}
-                    `).join('')}
+                        ${property.breadcrumbs.map((crumb, index) => `
+                            <span class="cursor-pointer hover:text-blue-600 text-sm" 
+                                  onclick="handleBreadcrumbClick('${crumb}', ${index})">
+                                ${crumb}
+                            </span>
+                            ${index < property.breadcrumbs.length - 1 ? ' > ' : ''}
+                        `).join('')}
                     </div>
                     <div class="flex items-center justify-between mt-4">
                         <div>
@@ -344,16 +334,21 @@ function displayProperties(properties) {
         propertyGrid.innerHTML += propertyCard;
     });
 }
-function handleBreadcrumbClick(locationName, level, breadcrumbs) {
-    // Get breadcrumbs up to the clicked level
-    const selectedBreadcrumbs = breadcrumbs.slice(0, level + 1);
-    
-    // Create URL-friendly breadcrumb path
-    const urlPath = selectedBreadcrumbs
-        .map(crumb => encodeURIComponent(crumb))
-        .join('/');
-    
-    // Open in new tab
-    window.open(`/${urlPath}`, '_blank');
-    alert(`You clicked on ${urlPath}`);
+
+function handleBreadcrumbClick(locationName, level) {
+    $.ajax({
+        url: '/api/list/fetch',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                const location = response.locations.find(loc => 
+                    loc.value.toLowerCase() === locationName.toLowerCase()
+                );
+                if (location) {
+                    currentLocationId = location.id;
+                    loadPropertiesByLocation(location.id);
+                }
+            }
+        }
+    });
 }
