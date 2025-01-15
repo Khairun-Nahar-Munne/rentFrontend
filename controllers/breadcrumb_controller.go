@@ -51,8 +51,6 @@ func (c *PropertyViewController) Get() {
         return
     }
 
-    // Print the raw response for debugging
-    fmt.Printf("Raw API Response: %s\n", string(body))
 
     var apiResp map[string]interface{}
     if err := json.Unmarshal(body, &apiResp); err != nil {
