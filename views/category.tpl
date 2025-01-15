@@ -21,7 +21,7 @@
             <nav class="text-sm">
                 {{range $index, $crumb := .Breadcrumbs}}
                     {{if gt $index 0}}
-                        <span class="mx-2 text-gray-500">/</span>
+                        <span class="text-gray-500">></span>
                     {{end}}
                     <a href="/{{range $i, $part := $.Breadcrumbs}}{{if le $i $index}}{{if gt $i 0}}/{{end}}{{$part}}{{end}}{{end}}" 
                        class="text-[#27357e] hover:text-blue-700">
@@ -59,23 +59,36 @@
                             <!-- Property Info -->
                             <div class="p-4">
                                 <!-- Rating -->
-                                <div class="flex items-center gap-2 text-blue-600 mb-2">
+                                <div class="flex items-center justify-between gap-2 text-blue-600 mb-2">
+                                <div>
                                     <span class="font-bold">{{$property.Rating}}</span>
                                     <span class="text-sm">({{$property.ReviewCount}} Reviews)</span>
+                                </div>
                                     <span class="text-gray-600 text-sm">{{$property.Type}}</span>
                                 </div>
 
                                 <!-- Hotel Name -->
-                                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                <a href="/property-details?id={{$property.PropertyID}}" target="_blank" 
+                           class="text-gray-600 hover:underline block overflow-hidden text-ellipsis">
                                     {{$property.HotelName}}
-                                </h3>
-
+                                </a>
+                                  
+                                <!-- Amenities -->
+                                <div class="text-gray-600 text-xs my-2">
+                                    {{if $property.Amenities}}
+                                        {{range $amenity := $property.Amenities}}
+                                            <span class="text-sm text-gray-600 bg-gray-100 py-1 rounded">
+                                                {{$amenity}}
+                                            </span>
+                                        {{end}}
+                                    {{end}}
+                                </div>
                                 <!-- Property Breadcrumbs -->
-                                <div class="text-gray-600 mb-3">
+                                <div class="text-gray-600 mt-2 mb-3">
                                     {{if $property.Breadcrumbs}}
                                         {{range $index, $crumb := $property.Breadcrumbs}}
                                             {{if gt $index 0}}
-                                                <span class="mx-1 text-gray-400">/</span>
+                                                <span class="text-gray-400">></span>
                                             {{end}}
                                             <a href="/{{range $i, $part := $property.Breadcrumbs}}{{if le $i $index}}{{if gt $i 0}}/{{end}}{{$part}}{{end}}{{end}}"
                                                target="_blank"
@@ -85,23 +98,18 @@
                                         {{end}}
                                     {{end}}
                                 </div>
-                                
-                                <!-- Amenities -->
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    {{if $property.Amenities}}
-                                        {{range $amenity := $property.Amenities}}
-                                            <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                                {{$amenity}}
-                                            </span>
-                                        {{end}}
-                                    {{end}}
-                                </div>
+                              
 
                                 <!-- View Button -->
-                                <a href="#" 
-                                   class="block w-full text-center bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700 transition-colors">
-                                    View Availability
-                                </a>
+                                <div class="flex items-center justify-between mt-4">
+                                    <div>
+                                        <img src="https://static.rentbyowner.com/release/28.0.6/static/images/booking.svg" alt="Booking.com">
+                                    </div>
+                                    <button onclick="window.open('/property-details?id=${property.property_id}', '_blank')" 
+                                            class="bg-emerald-500 text-white px-4 py-2 rounded-lg">
+                                        View Availability
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     {{end}}

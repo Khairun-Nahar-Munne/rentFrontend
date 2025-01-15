@@ -1,13 +1,14 @@
 package controllers
 
 import (
-    "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "net/http"
-    "strings"
-    "rentFrontend/models"
-    beego "github.com/beego/beego/v2/server/web"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"rentFrontend/models"
+	"strings"
+
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 type PropertyViewController struct {
@@ -24,7 +25,7 @@ func (c *PropertyViewController) Get() {
         c.Data["PageTitle"] = "Vacation Rentals"
         c.Data["Breadcrumbs"] = []string{"Home"}
         c.Data["Properties"] = models.PropertyResponse{Success: true}
-        c.TplName = "list.tpl"
+        c.TplName = "category.tpl"
         return
     }
     
@@ -97,13 +98,13 @@ func (c *PropertyViewController) Get() {
     c.Data["Breadcrumbs"] = breadcrumbs
     c.Data["Properties"] = propertyResp
     // In your Go code where you set up the template
-    c.TplName = "list.tpl"
+    c.TplName = "category.tpl"
 }
 
 func (c *PropertyViewController) handleError(message string) {
     c.Data["Error"] = message
     c.Data["Properties"] = models.PropertyResponse{Success: false}
-    c.TplName = "list.tpl"
+    c.TplName = "category.tpl"
 }
 
 func formatBreadcrumb(crumb string) string {

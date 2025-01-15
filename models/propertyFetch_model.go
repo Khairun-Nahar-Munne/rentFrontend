@@ -17,6 +17,7 @@ type Property struct {
     ID              int      `json:"id"`
     PropertyID      int      `json:"property_id"`
     PropertySlugID  string   `json:"property_slug_id"`
+    CityInTrans     string  `json:"city_in_trans"`
     HotelName       string   `json:"hotel_name"`
     Bedrooms        int      `json:"bedrooms"`
     Bathrooms       int      `json:"bathrooms"`

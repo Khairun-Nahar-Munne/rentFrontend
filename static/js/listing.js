@@ -63,19 +63,7 @@ $(document).ready(function() {
     $(document).on('touchmove', '.property-slider', handleTouchMove);
 });
 
-function updateURL(location) {
-    if (location && location.properties && location.properties[0]) {
-        const breadcrumbs = location.properties[0].breadcrumbs;
-        // Create URL-friendly breadcrumb path
-        const urlPath = breadcrumbs
-            .map(crumb => encodeURIComponent(crumb.toLowerCase().replace(/\s+/g, ' ')))
-            .join('/');
-        
-        // Update URL without refreshing the page
-        const newURL = `/${urlPath}`;
-        window.history.pushState({ locationId: location.id }, '', newURL);
-    }
-}
+
 function showLocationDropdown(query) {
     $.ajax({
         url: '/api/list/fetch',
@@ -131,8 +119,6 @@ function loadPropertiesByLocation(locationId) {
                     // Update search input with current location
                     $('#locationSearch').val(location.value);
                     selectedLocation = location;
-                    // Update URL with new location
-                    updateURL(location);
                 }
             }
         },
@@ -142,12 +128,6 @@ function loadPropertiesByLocation(locationId) {
     });
 }
 
-// Add event listener for browser back/forward buttons
-window.addEventListener('popstate', function(event) {
-    if (event.state && event.state.locationId) {
-        loadPropertiesByLocation(event.state.locationId);
-    }
-});
 
 function updateBreadcrumb(location) {
     if (location.properties && location.properties.length > 0 && location.properties[0].breadcrumbs) {
